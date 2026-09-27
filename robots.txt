@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://huzaifabroo108-bit.github.io/stickerly/sitemap.xml
