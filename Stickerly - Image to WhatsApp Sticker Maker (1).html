@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Stickerly — Turn Any Image Into a WhatsApp Sticker</title>
+  <meta name="description" content="Free online WhatsApp sticker maker. Convert PNG, JPG, and WEBP photos into high-quality 512x512 transparent WhatsApp stickers in seconds.">
+  <meta name="keywords" content="WhatsApp Sticker Maker, Photo to Sticker, Image to WhatsApp Sticker, Transparent Sticker Creator, Online Sticker Generator">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://YOUR-DOMAIN.com/">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://YOUR-DOMAIN.com/">
+  <meta property="og:title" content="Stickerly — Online WhatsApp Sticker Maker">
+  <meta property="og:description" content="Upload images, customize with shape masks, text, and borders, and export ready-to-use 512x512 PNG WhatsApp stickers.">
+  <meta property="og:image" content="https://YOUR-DOMAIN.com/og-image.png">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:title" content="Stickerly — Online WhatsApp Sticker Maker">
+  <meta property="twitter:description" content="Create custom WhatsApp stickers online from any image fast and free.">
+
+  <!-- Favicon SVG -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='28' fill='%2325D366'/><path d='M30 25h40a10 10 0 0 1 10 10v30a10 10 0 0 1-10 10H45L30 82V75a10 10 0 0 1-10-10V35a10 10 0 0 1 10-10z' fill='white'/><circle cx='38' cy='48' r='5' fill='%2325D366'/><circle cx='50' cy='48' r='5' fill='%2325D366'/><circle cx='62' cy='48' r='5' fill='%2325D366'/></svg>">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eefbf3',
+              100: '#d5f6e1',
+              500: '#25D366',
+              600: '#1da851',
+              700: '#16813e',
+              900: '#0b411f'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      overflow-x: hidden;
+      width: 100vw;
+    }
+
+    /* Transparency Checkerboard */
+    .checkerboard {
+      background-color: #f0f2f5;
+      background-image: 
+        linear-gradient(45deg, #cbd5e1 25%, transparent 25%), 
+        linear-gradient(-45deg, #cbd5e1 25%, transparent 25%), 
+        linear-gradient(45deg, transparent 75%, #cbd5e1 75%), 
+        linear-gradient(-45deg, transparent 75%, #cbd5e1 75%);
+      background-size: 16px 16px;
+      background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+    }
+
+    .dark .checkerboard {
+      background-color: #1e293b;
+      background-image: 
+        linear-gradient(45deg, #334155 25%, transparent 25%), 
+        linear-gradient(-45deg, #334155 25%, transparent 25%), 
+        linear-gradient(45deg, transparent 75%, #334155 75%), 
+        linear-gradient(-45deg, transparent 75%, #334155 75%);
+    }
+
+    /* WhatsApp Chat Bubble Pattern */
+    .chat-bg-light {
+      background-color: #efeae2;
+      background-image: radial-gradient(#d1c7bd 1px, transparent 0);
+      background-size: 12px 12px;
+    }
+
+    .chat-bg-dark {
+      background-color: #0b141a;
+      background-image: radial-gradient(#1f2c34 1px, transparent 0);
+      background-size: 12px 12px;
+    }
+
+    /* Custom Scrollbar for tab bar */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Range Slider Styling */
+    input[type=range] {
+      accent-color: #25D366;
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-200">
+
+  <!-- HEADER -->
+  <header class="sticky top-0 z-40 w-full border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      
+      <!-- Logo -->
+      <a href="#" onclick="switchView('app'); return false;" class="flex items-center gap-2.5 font-extrabold text-xl tracking-tight text-slate-900 dark:text-white shrink-0">
+        <div class="w-9 h-9 rounded-xl bg-brand-500 flex items-center justify-center text-white shadow-md shadow-brand-500/20">
+          <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12c0 1.82.49 3.53 1.35 5L2 22l5.13-1.33A9.94 9.94 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.52 0-2.96-.39-4.22-1.08l-.3-.17-3.04.8.81-2.96-.2-.31A7.95 7.95 0 0 1 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8z"/>
+            <circle cx="9" cy="11.5" r="1.25"/>
+            <circle cx="12" cy="11.5" r="1.25"/>
+            <circle cx="15" cy="11.5" r="1.25"/>
+          </svg>
+        </div>
+        <span>Stickerly</span>
+      </a>
+
+      <!-- Desktop Nav -->
+      <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600 dark:text-slate-300">
+        <a href="#" onclick="switchView('app'); return false;" class="hover:text-brand-600 dark:hover:text-brand-500 transition">Sticker Maker</a>
+        <a href="#how-it-works" onclick="switchView('app'); navigateToHash('#how-it-works');" class="hover:text-brand-600 dark:hover:text-brand-500 transition">How It Works</a>
+        <a href="#faq" onclick="switchView('app'); navigateToHash('#faq');" class="hover:text-brand-600 dark:hover:text-brand-500 transition">FAQ</a>
+        <a href="#" onclick="openModal('about'); return false;" class="hover:text-brand-600 dark:hover:text-brand-500 transition">About</a>
+        <a href="#" onclick="openModal('contact'); return false;" class="hover:text-brand-600 dark:hover:text-brand-500 transition">Contact</a>
+      </nav>
+
+      <!-- Right Action Controls -->
+      <div class="flex items-center gap-2">
+        <!-- Dark/Light Theme Toggle -->
+        <button id="themeToggleBtn" onclick="toggleTheme()" class="p-2 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition" aria-label="Toggle theme">
+          <svg id="sunIcon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+          <svg id="moonIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+        </button>
+
+        <!-- SEO Deployment Code Modal Button -->
+        <button onclick="openModal('seo-info')" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+          SEO Docs
+        </button>
+
+        <!-- Mobile Menu Toggle -->
+        <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none" aria-label="Open menu">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobileMenu" class="hidden md:hidden border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 pt-2 pb-4 space-y-2 text-base font-medium">
+      <a href="#" onclick="switchView('app'); closeMobileMenu(); return false;" class="block py-2 px-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">Sticker Maker</a>
+      <a href="#how-it-works" onclick="switchView('app'); closeMobileMenu(); navigateToHash('#how-it-works');" class="block py-2 px-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">How It Works</a>
+      <a href="#faq" onclick="switchView('app'); closeMobileMenu(); navigateToHash('#faq');" class="block py-2 px-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">FAQ</a>
+      <a href="#" onclick="openModal('about'); closeMobileMenu(); return false;" class="block py-2 px-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">About</a>
+      <a href="#" onclick="openModal('contact'); closeMobileMenu(); return false;" class="block py-2 px-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">Contact</a>
+      <a href="#" onclick="openModal('privacy'); closeMobileMenu(); return false;" class="block py-2 px-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">Privacy Policy</a>
+      <a href="#" onclick="openModal('terms'); closeMobileMenu(); return false;" class="block py-2 px-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">Terms of Service</a>
+    </div>
+  </header>
+
+  <!-- MAIN APP CONTAINER -->
+  <main class="flex-grow">
+    
+    <!-- HERO SECTION -->
+    <section class="pt-8 pb-6 md:pt-12 md:pb-8 text-center px-4 max-w-4xl mx-auto">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-500 text-xs font-semibold mb-3 border border-brand-500/20">
+        <span class="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
+        100% Free &amp; Private — Client-Side Generator
+      </div>
+      <h1 class="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+        Turn Any Image Into a <span class="text-brand-600 dark:text-brand-500">WhatsApp Sticker</span>
+      </h1>
+      <p class="mt-3 text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+        Upload an image, customize it with borders, text, and emojis, and download your 512×512 sticker in seconds.
+      </p>
+    </section>
+
+    <!-- STICKER MAKER WORKSPACE -->
+    <section id="editor-section" class="max-w-5xl mx-auto px-3 sm:px-6 pb-12">
+      <div class="bg-white dark:bg-slate-800/80 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-700/60 shadow-xl overflow-hidden backdrop-blur">
+        
+        <!-- STATE 1: UPLOAD AREA (BEFORE IMAGE SELECTION) -->
+        <div id="uploadContainer" class="p-6 sm:p-12 text-center">
+          <div 
+            id="dropZone"
+            onopacity="1"
+            class="border-2 border-dashed border-slate-300 dark:border-slate-600 hover:border-brand-500 dark:hover:border-brand-500 rounded-2xl p-8 sm:p-12 transition-all cursor-pointer bg-slate-50/50 dark:bg-slate-800/40 hover:bg-brand-50/30 dark:hover:bg-brand-900/10 flex flex-col items-center justify-center min-h-[280px]"
+            onclick="document.getElementById('fileInput').click()"
+            ondragover="handleDragOver(event)"
+            onmouseleave="handleDragLeave(event)"
+            ondrop="handleDrop(event)"
+          >
+            <div class="w-16 h-16 rounded-full bg-brand-100 dark:bg-brand-900/50 text-brand-600 dark:text-brand-500 flex items-center justify-center mb-4">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </div>
+            <h2 class="text-xl font-bold text-slate-900 dark:text-white">Create Your Sticker</h2>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 mb-6 max-w-sm">
+              Drag &amp; drop your JPG, PNG, or WEBP photo here, or click to browse. Max size 20MB.
+            </p>
+            
+            <button type="button" class="px-6 py-3 rounded-xl bg-brand-500 hover:bg-brand-600 active:scale-95 text-white font-bold text-sm shadow-lg shadow-brand-500/25 transition flex items-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              Upload Image
+            </button>
+            <input type="file" id="fileInput" accept="image/png, image/jpeg, image/webp" class="hidden" onchange="handleFileSelect(event)">
+          </div>
+          <div id="uploadErrorMessage" class="hidden mt-4 p-3 rounded-xl bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 text-xs sm:text-sm font-medium border border-rose-200 dark:border-rose-800"></div>
+        </div>
+
+        <!-- STATE 2: INTERACTIVE EDITOR (AFTER IMAGE SELECTION) -->
+        <div id="editorWorkspace" class="hidden p-4 sm:p-6 lg:p-8">
+          
+          <!-- Top Editor Utility Bar -->
+          <div class="flex flex-wrap items-center justify-between gap-2 pb-4 mb-4 border-b border-slate-200 dark:border-slate-700">
+            <div class="flex items-center gap-1 sm:gap-2">
+              <button onclick="undoState()" id="undoBtn" disabled class="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-semibold disabled:opacity-40 hover:bg-slate-100 dark:hover:bg-slate-700 transition flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+                Undo
+              </button>
+              <button onclick="redoState()" id="redoBtn" disabled class="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-semibold disabled:opacity-40 hover:bg-slate-100 dark:hover:bg-slate-700 transition flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10H11a8 8 0 00-8 8v2m18-10l-6 6m6-6l-6-6"/></svg>
+                Redo
+              </button>
+              <button onclick="resetEditor()" class="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-semibold text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                Reset
+              </button>
+            </div>
+
+            <button onclick="confirmNewImage()" class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold hover:bg-slate-200 dark:hover:bg-slate-600 transition flex items-center gap-1">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+              New Image
+            </button>
+          </div>
+
+          <!-- Main Two-Column Layout -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            <!-- LEFT COLUMN: CANVAS & PREVIEW -->
+            <div class="lg:col-span-5 flex flex-col items-center">
+              
+              <!-- Hidden Source Canvas & Active Output Canvas Container -->
+              <div class="relative w-full max-w-[340px] sm:max-w-[380px] aspect-square rounded-2xl overflow-hidden shadow-inner border border-slate-200 dark:border-slate-700 checkerboard flex items-center justify-center group touch-none">
+                <canvas id="stickerCanvas" width="512" height="512" class="w-full h-full object-contain cursor-grab active:cursor-grabbing"></canvas>
+
+                <!-- Helper Canvas Hint Overlay -->
+                <div class="absolute bottom-2 left-2 right-2 pointer-events-none opacity-0 group-hover:opacity-100 transition text-[10px] bg-slate-900/80 text-white py-1 px-2.5 rounded-lg text-center backdrop-blur">
+                  Drag to move • Scroll/Pinch to zoom
+                </div>
+              </div>
+
+              <!-- View Switcher (Sticker Canvas vs WhatsApp Chat Preview) -->
+              <div class="mt-3 flex items-center gap-2 bg-slate-100 dark:bg-slate-700/50 p-1 rounded-xl text-xs font-medium w-full max-w-[340px] sm:max-w-[380px]">
+                <button id="viewStickerModeBtn" onclick="togglePreviewMode('canvas')" class="flex-1 py-1.5 rounded-lg bg-white dark:bg-slate-800 shadow-sm text-brand-600 dark:text-brand-400 font-bold transition">Editor Canvas</button>
+                <button id="viewChatModeBtn" onclick="togglePreviewMode('chat')" class="flex-1 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 transition">WhatsApp Chat</button>
+              </div>
+
+              <!-- Chat Preview Drawer (Hidden by Default) -->
+              <div id="chatPreviewContainer" class="hidden mt-3 w-full max-w-[340px] sm:max-w-[380px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-md">
+                <div class="bg-slate-200 dark:bg-slate-800 p-2.5 flex items-center gap-2 border-b border-slate-300 dark:border-slate-700">
+                  <div class="w-7 h-7 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs">S</div>
+                  <span class="text-xs font-semibold">WhatsApp Chat Preview</span>
+                </div>
+                <div id="chatBgElement" class="chat-bg-light p-4 min-h-[220px] flex flex-col justify-end">
+                  <div class="self-start max-w-[80%] bg-white dark:bg-slate-800 rounded-lg p-2.5 shadow text-xs mb-3 text-slate-800 dark:text-slate-100">
+                    Check out this sticker I made! 👇
+                  </div>
+                  <div class="self-start max-w-[160px] aspect-square relative">
+                    <img id="chatStickerImg" class="w-full h-full object-contain drop-shadow-md" alt="Sticker preview">
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN: EDITOR CONTROLS TABS -->
+            <div class="lg:col-span-7 flex flex-col">
+              
+              <!-- Tab Navigation Bar -->
+              <div class="flex overflow-x-auto no-scrollbar gap-1 border-b border-slate-200 dark:border-slate-700 pb-2 mb-4 shrink-0">
+                <button onclick="switchTab('transform')" id="tabBtn-transform" class="tab-btn px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-brand-500 text-white shadow-sm transition">Crop &amp; Position</button>
+                <button onclick="switchTab('shape')" id="tabBtn-shape" class="tab-btn px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition">Shape &amp; Border</button>
+                <button onclick="switchTab('background')" id="tabBtn-background" class="tab-btn px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition">Background</button>
+                <button onclick="switchTab('text')" id="tabBtn-text" class="tab-btn px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition">Text</button>
+                <button onclick="switchTab('emoji')" id="tabBtn-emoji" class="tab-btn px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition">Emoji</button>
+              </div>
+
+              <!-- TAB CONTENT PANELS -->
+              <div class="space-y-4 flex-grow min-h-[260px]">
+                
+                <!-- TAB 1: CROP & POSITION -->
+                <div id="tabPanel-transform" class="tab-panel space-y-4">
+                  <!-- Zoom Slider -->
+                  <div>
+                    <div class="flex justify-between items-center text-xs font-medium mb-1.5">
+                      <span class="text-slate-600 dark:text-slate-400">Zoom Scale</span>
+                      <span id="zoomValText" class="font-bold text-brand-600 dark:text-brand-400">100%</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <button onclick="stepZoom(-0.1)" class="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 font-bold text-xs">-</button>
+                      <input type="range" id="zoomSlider" min="0.2" max="3.0" step="0.05" value="1.0" oninput="updateZoomFromSlider(this.value)" class="w-full">
+                      <button onclick="stepZoom(0.1)" class="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 font-bold text-xs">+</button>
+                    </div>
+                  </div>
+
+                  <!-- Quick Action Grid -->
+                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2">
+                    <button onclick="rotateImage(-90)" class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-700/60 transition flex flex-col items-center gap-1">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+                      Rotate Left
+                    </button>
+                    <button onclick="rotateImage(90)" class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-700/60 transition flex flex-col items-center gap-1">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10H11a8 8 0 00-8 8v2m18-10l-6 6m6-6l-6-6"/></svg>
+                      Rotate Right
+                    </button>
+                    <button onclick="toggleFlip('H')" class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-700/60 transition flex flex-col items-center gap-1">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                      Flip Horiz
+                    </button>
+                    <button onclick="toggleFlip('V')" class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-700/60 transition flex flex-col items-center gap-1">
+                      <svg class="w-4 h-4 transform rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                      Flip Vert
+                    </button>
+                  </div>
+
+                  <div class="pt-2">
+                    <button onclick="centerImagePosition()" class="w-full py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-700 transition flex items-center justify-center gap-2">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+                      Center Image
+                    </button>
+                  </div>
+                </div>
+
+                <!-- TAB 2: SHAPE & BORDER -->
+                <div id="tabPanel-shape" class="tab-panel hidden space-y-4">
+                  <!-- Shape Mask Options -->
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-2">Sticker Mask Shape</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                      <button onclick="setShape('original')" id="shapeBtn-original" class="shape-btn p-2.5 rounded-xl border-2 border-brand-500 bg-brand-50/50 dark:bg-brand-900/20 text-xs font-semibold transition">Original</button>
+                      <button onclick="setShape('square')" id="shapeBtn-square" class="shape-btn p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold transition">Square</button>
+                      <button onclick="setShape('rounded')" id="shapeBtn-rounded" class="shape-btn p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold transition">Rounded</button>
+                      <button onclick="setShape('circle')" id="shapeBtn-circle" class="shape-btn p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold transition">Circle</button>
+                    </div>
+                  </div>
+
+                  <!-- Border Color -->
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-2">Contour Border Style</label>
+                    <div class="grid grid-cols-3 gap-2">
+                      <button onclick="setBorderColor('none')" id="borderColorBtn-none" class="border-color-btn p-2 rounded-xl border-2 border-brand-500 text-xs font-semibold transition">None</button>
+                      <button onclick="setBorderColor('white')" id="borderColorBtn-white" class="border-color-btn p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+                        <span class="w-3 h-3 rounded-full bg-white border border-slate-300"></span> White
+                      </button>
+                      <button onclick="setBorderColor('black')" id="borderColorBtn-black" class="border-color-btn p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+                        <span class="w-3 h-3 rounded-full bg-black"></span> Black
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Border Width -->
+                  <div id="borderWidthContainer" class="opacity-50 pointer-events-none transition-all">
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-2">Border Thickness</label>
+                    <div class="grid grid-cols-3 gap-2">
+                      <button onclick="setBorderWidth(6)" id="borderWidthBtn-6" class="border-width-btn p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold transition">Thin</button>
+                      <button onclick="setBorderWidth(14)" id="borderWidthBtn-14" class="border-width-btn p-2 rounded-xl border-2 border-brand-500 bg-brand-50/50 dark:bg-brand-900/20 text-xs font-semibold transition">Medium</button>
+                      <button onclick="setBorderWidth(22)" id="borderWidthBtn-22" class="border-width-btn p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold transition">Thick</button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- TAB 3: BACKGROUND -->
+                <div id="tabPanel-background" class="tab-panel hidden space-y-4">
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-2">Background Transparency Mode</label>
+                    <div class="space-y-2">
+                      <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/40 cursor-pointer transition">
+                        <input type="radio" name="bgMode" value="transparent" checked onchange="setBackgroundMode('transparent')" class="text-brand-500 focus:ring-brand-500">
+                        <div>
+                          <span class="block text-xs font-bold text-slate-900 dark:text-white">Transparent Canvas</span>
+                          <span class="block text-[11px] text-slate-500 dark:text-slate-400">Preserves PNG image transparency for native WhatsApp look.</span>
+                        </div>
+                      </label>
+
+                      <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/40 cursor-pointer transition">
+                        <input type="radio" name="bgMode" value="color" onchange="setBackgroundMode('color')" class="text-brand-500 focus:ring-brand-500">
+                        <div>
+                          <span class="block text-xs font-bold text-slate-900 dark:text-white">Solid Fill Color</span>
+                          <span class="block text-[11px] text-slate-500 dark:text-slate-400">Fills canvas background with custom solid color.</span>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+
+                  <!-- Color Picker (Active when Solid Fill selected) -->
+                  <div id="bgColorPickerSection" class="hidden pt-2">
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Choose Fill Color</label>
+                    <div class="flex items-center gap-3">
+                      <input type="color" id="bgColorInput" value="#ffffff" onchange="setBgColor(this.value)" class="w-10 h-10 rounded-lg border-0 cursor-pointer bg-transparent">
+                      <span id="bgColorHexText" class="text-xs font-mono font-semibold uppercase text-slate-600 dark:text-slate-300">#FFFFFF</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- TAB 4: TEXT TOOL -->
+                <div id="tabPanel-text" class="tab-panel hidden space-y-4">
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Sticker Caption Text</label>
+                    <input type="text" id="textInput" placeholder="Enter text (e.g. WOW!, LOL)" oninput="updateTextCaption(this.value)" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-3">
+                    <div>
+                      <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Text Fill Color</label>
+                      <input type="color" id="textColorInput" value="#ffffff" onchange="setTextColor(this.value)" class="w-full h-9 rounded-lg cursor-pointer bg-transparent">
+                    </div>
+                    <div>
+                      <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Outline Color</label>
+                      <input type="color" id="textStrokeColorInput" value="#000000" onchange="setTextStrokeColor(this.value)" class="w-full h-9 rounded-lg cursor-pointer bg-transparent">
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-3">
+                    <div>
+                      <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Font Size</label>
+                      <input type="range" id="fontSizeSlider" min="20" max="90" value="44" oninput="setFontSize(this.value)" class="w-full">
+                    </div>
+                    <div>
+                      <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Vertical Position</label>
+                      <input type="range" id="textPosSlider" min="0.1" max="0.9" step="0.02" value="0.85" oninput="setTextPosY(this.value)" class="w-full">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- TAB 5: EMOJI TOOL -->
+                <div id="tabPanel-emoji" class="tab-panel hidden space-y-4">
+                  <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Quick Stamp Emoji</label>
+                  <div class="grid grid-cols-6 sm:grid-cols-6 gap-2">
+                    <button onclick="setEmoji('😂')" class="p-2.5 text-2xl rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-95 transition">😂</button>
+                    <button onclick="setEmoji('❤️')" class="p-2.5 text-2xl rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-95 transition">❤️</button>
+                    <button onclick="setEmoji('🔥')" class="p-2.5 text-2xl rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-95 transition">🔥</button>
+                    <button onclick="setEmoji('😍')" class="p-2.5 text-2xl rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-95 transition">😍</button>
+                    <button onclick="setEmoji('😎')" class="p-2.5 text-2xl rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-95 transition">😎</button>
+                    <button onclick="setEmoji('😭')" class="p-2.5 text-2xl rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-95 transition">😭</button>
+                    <button onclick="setEmoji('🤣')" class="p-2.5 text-2xl rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-95 transition">🤣</button>
+                    <button onclick="setEmoji('👍')" class="p-2.5 text-2xl rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-95 transition">👍</button>
+                    <button onclick="setEmoji('👑')" class="p-2.5 text-2xl rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-95 transition">👑</button>
+                    <button onclick="setEmoji('🥺')" class="p-2.5 text-2xl rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-95 transition">🥺</button>
+                    <button onclick="setEmoji('💀')" class="p-2.5 text-2xl rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-95 transition">💀</button>
+                    <button onclick="setEmoji('😡')" class="p-2.5 text-2xl rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-95 transition">😡</button>
+                  </div>
+
+                  <div id="selectedEmojiControl" class="hidden pt-2 flex items-center justify-between border-t border-slate-200 dark:border-slate-700">
+                    <span class="text-xs text-slate-500">Active Emoji Added</span>
+                    <button onclick="clearEmoji()" class="text-xs text-rose-500 hover:underline font-semibold">Remove Emoji</button>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- BOTTOM EXPORT ACTION BAR -->
+              <div class="pt-6 border-t border-slate-200 dark:border-slate-700 mt-6 flex flex-col sm:flex-row gap-3">
+                <button 
+                  onclick="downloadSticker()" 
+                  id="downloadBtn"
+                  class="flex-1 py-3.5 px-6 rounded-xl bg-brand-500 hover:bg-brand-600 active:scale-[0.98] text-white font-bold text-sm shadow-lg shadow-brand-500/25 transition flex items-center justify-center gap-2"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                  Download Sticker (512×512)
+                </button>
+
+                <button 
+                  onclick="shareSticker()" 
+                  id="shareBtn"
+                  class="py-3.5 px-6 rounded-xl bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 active:scale-[0.98] text-white font-bold text-sm shadow-md transition flex items-center justify-center gap-2"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+                  Share
+                </button>
+              </div>
+
+              <!-- Status Feedback Notification -->
+              <div id="statusNotification" class="hidden mt-3 p-3 rounded-xl text-xs font-medium text-center"></div>
+
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS SECTION -->
+    <section id="how-it-works" class="py-12 bg-white dark:bg-slate-800/40 border-y border-slate-200/60 dark:border-slate-800 px-4">
+      <div class="max-w-5xl mx-auto">
+        <div class="text-center mb-10">
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">How to Make a WhatsApp Sticker</h2>
+          <p class="text-sm sm:text-base text-slate-500 dark:text-slate-400 mt-2">Follow these simple steps to transform photos into custom stickers.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-700">
+            <div class="w-10 h-10 rounded-xl bg-brand-500 text-white font-bold flex items-center justify-center mb-4 text-base">1</div>
+            <h3 class="font-bold text-slate-900 dark:text-white text-base mb-2">Upload Your Image</h3>
+            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">Select any JPG, PNG, or WEBP photo from your phone or desktop computer gallery.</p>
+          </div>
+
+          <div class="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-700">
+            <div class="w-10 h-10 rounded-xl bg-brand-500 text-white font-bold flex items-center justify-center mb-4 text-base">2</div>
+            <h3 class="font-bold text-slate-900 dark:text-white text-base mb-2">Customize &amp; Frame</h3>
+            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">Crop into circles or rounded shapes, add crisp white contour borders, captions, and emojis.</p>
+          </div>
+
+          <div class="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-700">
+            <div class="w-10 h-10 rounded-xl bg-brand-500 text-white font-bold flex items-center justify-center mb-4 text-base">3</div>
+            <h3 class="font-bold text-slate-900 dark:text-white text-base mb-2">Download or Share</h3>
+            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">Export as an exact 512×512 PNG file ready to add into WhatsApp custom sticker packs.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WHY USE STICKERLY -->
+    <section class="py-12 px-4 max-w-5xl mx-auto">
+      <div class="text-center mb-8">
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">Why Choose Stickerly?</h2>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-left">
+        <div class="p-5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/60">
+          <div class="text-brand-500 mb-2 font-bold text-lg">⚡ Instant Export</div>
+          <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">Generates exact 512x512 PNG files meeting official WhatsApp sticker specifications instantly.</p>
+        </div>
+
+        <div class="p-5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/60">
+          <div class="text-brand-500 mb-2 font-bold text-lg">🔒 100% Client-Side Privacy</div>
+          <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">Your photos are processed directly inside your Web browser. Images are never uploaded to any remote server.</p>
+        </div>
+
+        <div class="p-5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/60">
+          <div class="text-brand-500 mb-2 font-bold text-lg">📱 Mobile First</div>
+          <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">Smooth touch dragging, pinch zooming, and responsive layouts engineered for Android &amp; iOS devices.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FREQUENTLY ASKED QUESTIONS (FAQ) -->
+    <section id="faq" class="py-12 bg-slate-100/70 dark:bg-slate-800/30 border-t border-slate-200/60 dark:border-slate-800 px-4">
+      <div class="max-w-3xl mx-auto">
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-center text-slate-900 dark:text-white mb-8">Frequently Asked Questions</h2>
+
+        <div class="space-y-3">
+          <details class="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 text-sm [&_summary::-webkit-details-marker]:none">
+            <summary class="flex items-center justify-between font-bold cursor-pointer text-slate-900 dark:text-white">
+              <span>What image formats does Stickerly support?</span>
+              <span class="transition group-open:rotate-180">▼</span>
+            </summary>
+            <p class="mt-3 text-slate-600 dark:text-slate-400 text-xs sm:text-sm leading-relaxed">
+              Stickerly supports PNG, JPG, JPEG, and WEBP image formats up to 20MB in size.
+            </p>
+          </details>
+
+          <details class="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 text-sm [&_summary::-webkit-details-marker]:none">
+            <summary class="flex items-center justify-between font-bold cursor-pointer text-slate-900 dark:text-white">
+              <span>What is the size of exported WhatsApp stickers?</span>
+              <span class="transition group-open:rotate-180">▼</span>
+            </summary>
+            <p class="mt-3 text-slate-600 dark:text-slate-400 text-xs sm:text-sm leading-relaxed">
+              All exported stickers are rendered at exactly 512 × 512 pixels in standard PNG format, which is required by WhatsApp.
+            </p>
+          </details>
+
+          <details class="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 text-sm [&_summary::-webkit-details-marker]:none">
+            <summary class="flex items-center justify-between font-bold cursor-pointer text-slate-900 dark:text-white">
+              <span>Does Stickerly upload my private photos?</span>
+              <span class="transition group-open:rotate-180">▼</span>
+            </summary>
+            <p class="mt-3 text-slate-600 dark:text-slate-400 text-xs sm:text-sm leading-relaxed">
+              No. All editing, rendering, cropping, and PNG generation happen locally inside your web browser using HTML5 Canvas technology.
+            </p>
+          </details>
+
+          <details class="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 text-sm [&_summary::-webkit-details-marker]:none">
+            <summary class="flex items-center justify-between font-bold cursor-pointer text-slate-900 dark:text-white">
+              <span>How do I add downloaded stickers into WhatsApp?</span>
+              <span class="transition group-open:rotate-180">▼</span>
+            </summary>
+            <p class="mt-3 text-slate-600 dark:text-slate-400 text-xs sm:text-sm leading-relaxed">
+              After downloading the 512x512 PNG, open WhatsApp on Android or iOS, go to any chat, tap the Sticker icon, and tap "+" to import or select from photo gallery.
+            </p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL / SPA OVERLAYS (ABOUT, PRIVACY, TERMS, CONTACT, SEO DOCS) -->
+  <div id="modalBackdrop" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-6 sm:p-8 shadow-2xl border border-slate-200 dark:border-slate-700 relative">
+      
+      <button onclick="closeModal()" class="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+
+      <!-- MODAL CONTENT: ABOUT -->
+      <div id="modalContent-about" class="modal-section hidden space-y-4">
+        <h2 class="text-2xl font-bold text-slate-900 dark:text-white">About Stickerly</h2>
+        <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+          Stickerly is a dedicated online utility designed to help users create custom WhatsApp stickers directly from their images. Built with high performance and accessibility in mind, Stickerly provides intuitive tools for scaling, masking, text captions, and contour borders.
+        </p>
+        <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+          Our core focus is client-side privacy and speed. Every image transformation occurs locally on your device without transmitting data across external servers.
+        </p>
+      </div>
+
+      <!-- MODAL CONTENT: PRIVACY POLICY -->
+      <div id="modalContent-privacy" class="modal-section hidden space-y-4">
+        <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Privacy Policy</h2>
+        <p class="text-xs text-slate-500">Effective Date: September 2026</p>
+        <div class="text-sm text-slate-600 dark:text-slate-300 space-y-3 leading-relaxed">
+          <p><strong>Local Processing:</strong> Stickerly performs image editing and sticker creation entirely inside your web browser using HTML5 Canvas APIs. Uploaded image files are never stored or transmitted to external servers.</p>
+          <p><strong>Analytics &amp; Cookies:</strong> Standard local storage (`localStorage`) is used solely to store user preferences such as Dark/Light theme mode settings.</p>
+          <p><strong>Third-Party Services:</strong> Future monetization or analytics services, such as Google AdSense, may collect anonymous usage metrics if implemented in strict accordance with policy guidelines.</p>
+        </div>
+      </div>
+
+      <!-- MODAL CONTENT: TERMS OF SERVICE -->
+      <div id="modalContent-terms" class="modal-section hidden space-y-4">
+        <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Terms of Service</h2>
+        <div class="text-sm text-slate-600 dark:text-slate-300 space-y-3 leading-relaxed">
+          <p><strong>Acceptable Use:</strong> Users are solely responsible for ensuring they possess the necessary rights and permissions for images uploaded to Stickerly.</p>
+          <p><strong>Copyright Responsibility:</strong> Stickerly strictly prohibits using the tool to process copyrighted material without authorization. Users retain all ownership rights to their original images.</p>
+          <p><strong>Disclaimer:</strong> Stickerly is provided "as is" without warranty of any kind. Stickerly is an independent web tool and is not affiliated with, authorized, or endorsed by WhatsApp LLC or Meta Platforms, Inc.</p>
+        </div>
+      </div>
+
+      <!-- MODAL CONTENT: CONTACT -->
+      <div id="modalContent-contact" class="modal-section hidden space-y-4">
+        <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Contact Us</h2>
+        <p class="text-sm text-slate-600 dark:text-slate-300">
+          Have feedback or questions regarding Stickerly? Reach out directly via email below:
+        </p>
+        <div class="p-4 rounded-2xl bg-slate-100 dark:bg-slate-700/50 flex items-center justify-between">
+          <span class="text-sm font-semibold text-slate-800 dark:text-slate-200">support@YOUR-DOMAIN.com</span>
+          <a href="mailto:support@YOUR-DOMAIN.com" class="px-4 py-2 rounded-xl bg-brand-500 text-white font-bold text-xs hover:bg-brand-600 transition">Send Email</a>
+        </div>
+      </div>
+
+      <!-- MODAL CONTENT: SEO DEPLOYMENT FILES (ROBOTS & SITEMAP DOCS) -->
+      <div id="modalContent-seo-info" class="modal-section hidden space-y-4">
+        <h2 class="text-2xl font-bold text-slate-900 dark:text-white">SEO &amp; Static Hosting Docs</h2>
+        <p class="text-xs text-slate-500">Copy the files below for your domain deployment:</p>
+        
+        <div>
+          <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">robots.txt</label>
+          <pre class="bg-slate-900 text-slate-100 p-3 rounded-xl text-xs overflow-x-auto">User-agent: *
+Allow: /
+
+Sitemap: https://YOUR-DOMAIN.com/sitemap.xml</pre>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">sitemap.xml</label>
+          <pre class="bg-slate-900 text-slate-100 p-3 rounded-xl text-xs overflow-x-auto">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;urlset xmlns="http://www.sitemap.schemas.org/schemas/sitemap/0.9"&gt;
+  &lt;url&gt;
+    &lt;loc&gt;https://YOUR-DOMAIN.com/&lt;/loc&gt;
+    &lt;lastmod&gt;2026-09-27&lt;/lastmod&gt;
+    &lt;priority&gt;1.00&lt;/priority&gt;
+  &lt;/url&gt;
+&lt;/urlset&gt;</pre>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-8 px-4 mt-12 text-xs text-slate-500 dark:text-slate-400">
+    <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2 font-bold text-slate-900 dark:text-white text-sm">
+        <span>Stickerly</span>
+        <span class="text-slate-400 font-normal">— Simple tools for everyday tasks.</span>
+      </div>
+
+      <div class="flex flex-wrap justify-center gap-4 font-medium">
+        <a href="#" onclick="switchView('app'); return false;" class="hover:underline">Sticker Maker</a>
+        <a href="#" onclick="openModal('about'); return false;" class="hover:underline">About</a>
+        <a href="#" onclick="openModal('privacy'); return false;" class="hover:underline">Privacy Policy</a>
+        <a href="#" onclick="openModal('terms'); return false;" class="hover:underline">Terms of Service</a>
+        <a href="#" onclick="openModal('contact'); return false;" class="hover:underline">Contact</a>
+        <a href="#faq" onclick="switchView('app'); navigateToHash('#faq');" class="hover:underline">FAQ</a>
+      </div>
+
+      <div>
+        &copy; 2026 Stickerly. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <!-- ADSENSE CODE WILL BE ADDED AFTER GOOGLE PROVIDES THE REAL CODE -->
+
+  <script>
+    /* STICKERLY MASTER ENGINE - VANILLA JAVASCRIPT */
+
+    // Application Global State
+    const state = {
+      image: null,
+      zoom: 1.0,
+      rotation: 0,
+      flipH: 1,
+      flipV: 1,
+      posX: 0,
+      posY: 0,
+      shape: 'original', // 'original', 'square', 'rounded', 'circle'
+      borderColor: 'none', // 'none', 'white', 'black'
+      borderWidth: 14, // 6, 14, 22
+      bgMode: 'transparent', // 'transparent', 'color'
+      bgColor: '#ffffff',
+      textCaption: '',
+      textColor: '#ffffff',
+      textStrokeColor: '#000000',
+      fontSize: 44,
+      textPosY: 0.85,
+      emoji: '',
+      history: [],
+      historyIndex: -1
+    };
+
+    // Canvas References
+    let canvas, ctx;
+    let isDragging = false;
+    let dragStartX = 0;
+    let dragStartY = 0;
+
+    // Touch Pinch Tracking
+    let initialTouchDistance = null;
+    let initialZoom = 1.0;
+
+    // Window Load Initialization
+    window.onload = function() {
+      initTheme();
+      canvas = document.getElementById('stickerCanvas');
+      ctx = canvas.getContext('2d');
+
+      setupCanvasInteraction();
+      pushHistoryState();
+    };
+
+    function initTheme() {
+      const savedTheme = localStorage.getItem('stickerly_theme');
+      if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+        document.getElementById('sunIcon').classList.remove('hidden');
+        document.getElementById('moonIcon').classList.add('hidden');
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.getElementById('sunIcon').classList.add('hidden');
+        document.getElementById('moonIcon').classList.remove('hidden');
+      }
+    }
+
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('stickerly_theme', isDark ? 'dark' : 'light');
+      document.getElementById('sunIcon').classList.toggle('hidden', !isDark);
+      document.getElementById('moonIcon').classList.toggle('hidden', isDark);
+    }
+
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobileMenu');
+      menu.classList.toggle('hidden');
+    }
+
+    function closeMobileMenu() {
+      document.getElementById('mobileMenu').classList.add('hidden');
+    }
+
+    function switchView(view) {
+      if (view === 'app') {
+        closeModal();
+      }
+    }
+
+    function navigateToHash(hash) {
+      const el = document.querySelector(hash);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function openModal(modalId) {
+      document.querySelectorAll('.modal-section').forEach(el => el.classList.add('hidden'));
+      const target = document.getElementById('modalContent-' + modalId);
+      if (target) {
+        target.classList.remove('hidden');
+        document.getElementById('modalBackdrop').classList.remove('hidden');
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('modalBackdrop').classList.add('hidden');
+    }
+
+    function handleFileSelect(e) {
+      const file = e.target.files[0];
+      if (file) processFile(file);
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.currentTarget.classList.add('border-brand-500', 'bg-brand-50/50');
+    }
+
+    function handleDragLeave(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.currentTarget.classList.remove('border-brand-500', 'bg-brand-50/50');
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.currentTarget.classList.remove('border-brand-500', 'bg-brand-50/50');
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        processFile(e.dataTransfer.files[0]);
+      }
+    }
+
+    function processFile(file) {
+      const errorEl = document.getElementById('uploadErrorMessage');
+      errorEl.classList.add('hidden');
+
+      // Validations
+      const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+      if (!validTypes.includes(file.type)) {
+        showUploadError('Please upload a PNG, JPG, JPEG, or WEBP image.');
+        return;
+      }
+
+      if (file.size > 20 * 1024 * 1024) {
+        showUploadError('Please choose an image under 20 MB.');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const img = new Image();
+        img.onload = function() {
+          state.image = img;
+          resetStateDefaults();
+          document.getElementById('uploadContainer').classList.add('hidden');
+          document.getElementById('editorWorkspace').classList.remove('hidden');
+          renderCanvas();
+          pushHistoryState();
+        };
+        img.onerror = function() {
+          showUploadError('That image could not be opened. Please try another image.');
+        };
+        img.src = evt.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function showUploadError(msg) {
+      const errorEl = document.getElementById('uploadErrorMessage');
+      errorEl.textContent = msg;
+      errorEl.classList.remove('hidden');
+    }
+
+    function resetStateDefaults() {
+      state.zoom = 1.0;
+      state.rotation = 0;
+      state.flipH = 1;
+      state.flipV = 1;
+      state.posX = 0;
+      state.posY = 0;
+      state.shape = 'original';
+      state.borderColor = 'none';
+      state.borderWidth = 14;
+      state.bgMode = 'transparent';
+      state.textCaption = '';
+      state.emoji = '';
+      state.history = [];
+      state.historyIndex = -1;
+
+      // Reset controls UI
+      document.getElementById('zoomSlider').value = 1.0;
+      document.getElementById('zoomValText').textContent = '100%';
+      document.getElementById('textInput').value = '';
+      setShape('original', false);
+      setBorderColor('none', false);
+    }
+
+    function setupCanvasInteraction() {
+      // Mouse Events
+      canvas.addEventListener('mousedown', e => {
+        isDragging = true;
+        dragStartX = e.clientX - state.posX;
+        dragStartY = e.clientY - state.posY;
+      });
+
+      window.addEventListener('mousemove', e => {
+        if (!isDragging) return;
+        state.posX = e.clientX - dragStartX;
+        state.posY = e.clientY - dragStartY;
+        renderCanvas();
+      });
+
+      window.addEventListener('mouseup', () => {
+        if (isDragging) {
+          isDragging = false;
+          pushHistoryState();
+        }
+      });
+
+      // Wheel Zoom
+      canvas.addEventListener('wheel', e => {
+        e.preventDefault();
+        const delta = e.deltaY < 0 ? 0.05 : -0.05;
+        stepZoom(delta);
+      }, { passive: false });
+
+      // Touch Events (Drag & Pinch Zoom)
+      canvas.addEventListener('touchstart', e => {
+        if (e.touches.length === 1) {
+          isDragging = true;
+          dragStartX = e.touches[0].clientX - state.posX;
+          dragStartY = e.touches[0].clientY - state.posY;
+        } else if (e.touches.length === 2) {
+          isDragging = false;
+          initialTouchDistance = getTouchDistance(e.touches);
+          initialZoom = state.zoom;
+        }
+      });
+
+      canvas.addEventListener('touchmove', e => {
+        if (isDragging && e.touches.length === 1) {
+          state.posX = e.touches[0].clientX - dragStartX;
+          state.posY = e.touches[0].clientY - dragStartY;
+          renderCanvas();
+        } else if (e.touches.length === 2 && initialTouchDistance) {
+          const currentDist = getTouchDistance(e.touches);
+          const scale = currentDist / initialTouchDistance;
+          state.zoom = Math.min(Math.max(0.2, initialZoom * scale), 3.0);
+          document.getElementById('zoomSlider').value = state.zoom;
+          document.getElementById('zoomValText').textContent = Math.round(state.zoom * 100) + '%';
+          renderCanvas();
+        }
+      });
+
+      canvas.addEventListener('touchend', e => {
+        if (isDragging) {
+          isDragging = false;
+          pushHistoryState();
+        }
+        if (e.touches.length < 2) {
+          initialTouchDistance = null;
+        }
+      });
+    }
+
+    function getTouchDistance(touches) {
+      const dx = touches[0].clientX - touches[1].clientX;
+      const dy = touches[0].clientY - touches[1].clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    function renderCanvas() {
+      if (!ctx) return;
+
+      // Clear Canvas (512x512)
+      ctx.clearRect(0, 0, 512, 512);
+
+      // 1. Background Fill Mode
+      if (state.bgMode === 'color') {
+        ctx.fillStyle = state.bgColor;
+        ctx.fillRect(0, 0, 512, 512);
+      }
+
+      if (!state.image) return;
+
+      ctx.save();
+
+      // 2. Shape Masking Path Creation
+      createShapeClipPath(ctx);
+
+      // Apply Clipping Mask
+      ctx.clip();
+
+      // 3. Image Transformation
+      ctx.save();
+      ctx.translate(256 + state.posX, 256 + state.posY);
+      ctx.rotate((state.rotation * Math.PI) / 180);
+      ctx.scale(state.zoom * state.flipH, state.zoom * state.flipV);
+
+      // Smooth Rendering
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+
+      // Draw Image Centered
+      const iw = state.image.width;
+      const ih = state.image.height;
+      const aspect = iw / ih;
+      let drawW = 400;
+      let drawH = 400;
+
+      if (aspect > 1) {
+        drawH = 400 / aspect;
+      } else {
+        drawW = 400 * aspect;
+      }
+
+      ctx.drawImage(state.image, -drawW / 2, -drawH / 2, drawW, drawH);
+      ctx.restore();
+
+      ctx.restore(); // Restore unclipped state for border & overlay
+
+      // 4. Contour Border Rendering
+      if (state.borderColor !== 'none') {
+        ctx.save();
+        ctx.strokeStyle = state.borderColor === 'white' ? '#ffffff' : '#000000';
+        ctx.lineWidth = state.borderWidth;
+        createShapeClipPath(ctx);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // 5. Text Layer Overlay
+      if (state.textCaption.trim() !== '') {
+        ctx.save();
+        ctx.font = `900 ${state.fontSize}px 'Inter', sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        const textY = 512 * state.textPosY;
+
+        // Text Stroke Outline
+        ctx.strokeStyle = state.textStrokeColor;
+        ctx.lineWidth = Math.max(4, state.fontSize / 8);
+        ctx.lineJoin = 'round';
+        ctx.strokeText(state.textCaption, 256, textY);
+
+        // Text Fill
+        ctx.fillStyle = state.textColor;
+        ctx.fillText(state.textCaption, 256, textY);
+        ctx.restore();
+      }
+
+      // 6. Emoji Layer Overlay
+      if (state.emoji !== '') {
+        ctx.save();
+        ctx.font = '72px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(state.emoji, 256, 100);
+        ctx.restore();
+      }
+
+      // Sync Real-Time WhatsApp Chat Preview Image
+      const chatImg = document.getElementById('chatStickerImg');
+      if (chatImg) {
+        chatImg.src = canvas.toDataURL('image/png');
+      }
+    }
+
+    function createShapeClipPath(context) {
+      context.beginPath();
+      const margin = 20;
+      const size = 512 - margin * 2;
+
+      if (state.shape === 'original' || state.shape === 'square') {
+        context.rect(margin, margin, size, size);
+      } else if (state.shape === 'rounded') {
+        const radius = 48;
+        context.roundRect(margin, margin, size, size, radius);
+      } else if (state.shape === 'circle') {
+        context.arc(256, 256, size / 2, 0, Math.PI * 2);
+      }
+      context.closePath();
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-brand-500', 'text-white');
+        btn.classList.add('text-slate-600', 'dark:text-slate-400');
+      });
+      document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.add('hidden'));
+
+      const activeBtn = document.getElementById('tabBtn-' + tabId);
+      const activePanel = document.getElementById('tabPanel-' + tabId);
+
+      if (activeBtn) {
+        activeBtn.classList.add('bg-brand-500', 'text-white');
+        activeBtn.classList.remove('text-slate-600', 'dark:text-slate-400');
+      }
+      if (activePanel) {
+        activePanel.classList.remove('hidden');
+      }
+    }
+
+    function togglePreviewMode(mode) {
+      const stickerBtn = document.getElementById('viewStickerModeBtn');
+      const chatBtn = document.getElementById('viewChatModeBtn');
+      const chatContainer = document.getElementById('chatPreviewContainer');
+
+      if (mode === 'chat') {
+        chatContainer.classList.remove('hidden');
+        chatBtn.classList.add('bg-white', 'dark:bg-slate-800', 'text-brand-600', 'font-bold', 'shadow-sm');
+        stickerBtn.classList.remove('bg-white', 'dark:bg-slate-800', 'text-brand-600', 'font-bold', 'shadow-sm');
+      } else {
+        chatContainer.classList.add('hidden');
+        stickerBtn.classList.add('bg-white', 'dark:bg-slate-800', 'text-brand-600', 'font-bold', 'shadow-sm');
+        chatBtn.classList.remove('bg-white', 'dark:bg-slate-800', 'text-brand-600', 'font-bold', 'shadow-sm');
+      }
+    }
+
+    function stepZoom(delta) {
+      state.zoom = Math.min(Math.max(0.2, state.zoom + delta), 3.0);
+      document.getElementById('zoomSlider').value = state.zoom;
+      document.getElementById('zoomValText').textContent = Math.round(state.zoom * 100) + '%';
+      renderCanvas();
+      pushHistoryState();
+    }
+
+    function updateZoomFromSlider(val) {
+      state.zoom = parseFloat(val);
+      document.getElementById('zoomValText').textContent = Math.round(state.zoom * 100) + '%';
+      renderCanvas();
+    }
+
+    function rotateImage(deg) {
+      state.rotation = (state.rotation + deg) % 360;
+      renderCanvas();
+      pushHistoryState();
+    }
+
+    function toggleFlip(dir) {
+      if (dir === 'H') state.flipH *= -1;
+      if (dir === 'V') state.flipV *= -1;
+      renderCanvas();
+      pushHistoryState();
+    }
+
+    function centerImagePosition() {
+      state.posX = 0;
+      state.posY = 0;
+      renderCanvas();
+      pushHistoryState();
+    }
+
+    function setShape(shapeType, pushHistory = true) {
+      state.shape = shapeType;
+      document.querySelectorAll('.shape-btn').forEach(btn => {
+        btn.classList.remove('border-2', 'border-brand-500', 'bg-brand-50/50', 'dark:bg-brand-900/20');
+        btn.classList.add('border-slate-200', 'dark:border-slate-700');
+      });
+      const target = document.getElementById('shapeBtn-' + shapeType);
+      if (target) {
+        target.classList.add('border-2', 'border-brand-500', 'bg-brand-50/50', 'dark:bg-brand-900/20');
+        target.classList.remove('border-slate-200', 'dark:border-slate-700');
+      }
+      renderCanvas();
+      if (pushHistory) pushHistoryState();
+    }
+
+    function setBorderColor(color, pushHistory = true) {
+      state.borderColor = color;
+      document.querySelectorAll('.border-color-btn').forEach(btn => {
+        btn.classList.remove('border-2', 'border-brand-500');
+      });
+      const target = document.getElementById('borderColorBtn-' + color);
+      if (target) target.classList.add('border-2', 'border-brand-500');
+
+      const widthContainer = document.getElementById('borderWidthContainer');
+      if (color === 'none') {
+        widthContainer.classList.add('opacity-50', 'pointer-events-none');
+      } else {
+        widthContainer.classList.remove('opacity-50', 'pointer-events-none');
+      }
+
+      renderCanvas();
+      if (pushHistory) pushHistoryState();
+    }
+
+    function setBorderWidth(w) {
+      state.borderWidth = w;
+      document.querySelectorAll('.border-width-btn').forEach(btn => {
+        btn.classList.remove('border-2', 'border-brand-500', 'bg-brand-50/50', 'dark:bg-brand-900/20');
+      });
+      const target = document.getElementById('borderWidthBtn-' + w);
+      if (target) target.classList.add('border-2', 'border-brand-500', 'bg-brand-50/50', 'dark:bg-brand-900/20');
+      renderCanvas();
+      pushHistoryState();
+    }
+
+    function setBackgroundMode(mode) {
+      state.bgMode = mode;
+      const pickerSection = document.getElementById('bgColorPickerSection');
+      if (mode === 'color') {
+        pickerSection.classList.remove('hidden');
+      } else {
+        pickerSection.classList.add('hidden');
+      }
+      renderCanvas();
+      pushHistoryState();
+    }
+
+    function setBgColor(hex) {
+      state.bgColor = hex;
+      document.getElementById('bgColorHexText').textContent = hex;
+      renderCanvas();
+      pushHistoryState();
+    }
+
+    function updateTextCaption(txt) {
+      state.textCaption = txt;
+      renderCanvas();
+    }
+
+    function setTextColor(hex) {
+      state.textColor = hex;
+      renderCanvas();
+      pushHistoryState();
+    }
+
+    function setTextStrokeColor(hex) {
+      state.textStrokeColor = hex;
+      renderCanvas();
+      pushHistoryState();
+    }
+
+    function setFontSize(val) {
+      state.fontSize = parseInt(val);
+      renderCanvas();
+    }
+
+    function setTextPosY(val) {
+      state.textPosY = parseFloat(val);
+      renderCanvas();
+    }
+
+    function setEmoji(char) {
+      state.emoji = char;
+      document.getElementById('selectedEmojiControl').classList.remove('hidden');
+      renderCanvas();
+      pushHistoryState();
+    }
+
+    function clearEmoji() {
+      state.emoji = '';
+      document.getElementById('selectedEmojiControl').classList.add('hidden');
+      renderCanvas();
+      pushHistoryState();
+    }
+
+    function pushHistoryState() {
+      const snap = {
+        zoom: state.zoom,
+        rotation: state.rotation,
+        flipH: state.flipH,
+        flipV: state.flipV,
+        posX: state.posX,
+        posY: state.posY,
+        shape: state.shape,
+        borderColor: state.borderColor,
+        borderWidth: state.borderWidth,
+        bgMode: state.bgMode,
+        bgColor: state.bgColor,
+        textCaption: state.textCaption,
+        textColor: state.textColor,
+        textStrokeColor: state.textStrokeColor,
+        fontSize: state.fontSize,
+        textPosY: state.textPosY,
+        emoji: state.emoji
+      };
+
+      // Limit stack size
+      if (state.historyIndex < state.history.length - 1) {
+        state.history = state.history.slice(0, state.historyIndex + 1);
+      }
+
+      state.history.push(snap);
+      if (state.history.length > 25) state.history.shift();
+      state.historyIndex = state.history.length - 1;
+
+      updateUndoRedoButtons();
+    }
+
+    function undoState() {
+      if (state.historyIndex > 0) {
+        state.historyIndex--;
+        applyHistoryState(state.history[state.historyIndex]);
+      }
+    }
+
+    function redoState() {
+      if (state.historyIndex < state.history.length - 1) {
+        state.historyIndex++;
+        applyHistoryState(state.history[state.historyIndex]);
+      }
+    }
+
+    function applyHistoryState(snap) {
+      state.zoom = snap.zoom;
+      state.rotation = snap.rotation;
+      state.flipH = snap.flipH;
+      state.flipV = snap.flipV;
+      state.posX = snap.posX;
+      state.posY = snap.posY;
+      state.shape = snap.shape;
+      state.borderColor = snap.borderColor;
+      state.borderWidth = snap.borderWidth;
+      state.bgMode = snap.bgMode;
+      state.bgColor = snap.bgColor;
+      state.textCaption = snap.textCaption;
+      state.textColor = snap.textColor;
+      state.textStrokeColor = snap.textStrokeColor;
+      state.fontSize = snap.fontSize;
+      state.textPosY = snap.textPosY;
+      state.emoji = snap.emoji;
+
+      // Sync Controls
+      document.getElementById('zoomSlider').value = state.zoom;
+      document.getElementById('zoomValText').textContent = Math.round(state.zoom * 100) + '%';
+      document.getElementById('textInput').value = state.textCaption;
+
+      setShape(state.shape, false);
+      setBorderColor(state.borderColor, false);
+      renderCanvas();
+      updateUndoRedoButtons();
+    }
+
+    function updateUndoRedoButtons() {
+      document.getElementById('undoBtn').disabled = state.historyIndex <= 0;
+      document.getElementById('redoBtn').disabled = state.historyIndex >= state.history.length - 1;
+    }
+
+    function resetEditor() {
+      if (confirm('Reset sticker edits back to original?')) {
+        resetStateDefaults();
+        renderCanvas();
+        pushHistoryState();
+      }
+    }
+
+    function confirmNewImage() {
+      if (confirm('Start with a new image? Current edits will be cleared.')) {
+        document.getElementById('fileInput').value = '';
+        document.getElementById('editorWorkspace').classList.add('hidden');
+        document.getElementById('uploadContainer').classList.remove('hidden');
+      }
+    }
+
+    function downloadSticker() {
+      showStatus('Preparing 512×512 sticker PNG...', 'info');
+
+      try {
+        const dataUrl = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.download = 'stickerly-whatsapp-sticker.png';
+        link.href = dataUrl;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        showStatus('Sticker downloaded successfully!', 'success');
+      } catch (err) {
+        showStatus('Couldn\'t generate sticker download. Please try again.', 'error');
+      }
+    }
+
+    async function shareSticker() {
+      showStatus('Creating sticker share payload...', 'info');
+
+      try {
+        canvas.toBlob(async blob => {
+          if (!blob) {
+            showStatus('Couldn\'t share sticker file.', 'error');
+            return;
+          }
+
+          const file = new File([blob], 'stickerly-whatsapp-sticker.png', { type: 'image/png' });
+
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            try {
+              await navigator.share({
+                files: [file],
+                title: 'My Custom WhatsApp Sticker',
+                text: 'Created with Stickerly'
+              });
+              showStatus('Sticker shared successfully!', 'success');
+            } catch (shareErr) {
+              if (shareErr.name !== 'AbortError') {
+                showStatus('Couldn\'t share sticker. You can download it instead.', 'error');
+              } else {
+                hideStatus();
+              }
+            }
+          } else {
+            showStatus('Direct sharing isn\'t supported on this browser. Download your sticker and share it from your gallery.', 'error');
+          }
+        }, 'image/png');
+
+      } catch (err) {
+        showStatus('Couldn\'t share sticker. Download available.', 'error');
+      }
+    }
+
+    function showStatus(msg, type) {
+      const el = document.getElementById('statusNotification');
+      el.textContent = msg;
+      el.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-700', 'bg-rose-50', 'text-rose-700', 'bg-slate-100', 'text-slate-700');
+
+      if (type === 'success') {
+        el.classList.add('bg-emerald-50', 'text-emerald-700', 'border', 'border-emerald-200');
+      } else if (type === 'error') {
+        el.classList.add('bg-rose-50', 'text-rose-700', 'border', 'border-rose-200');
+      } else {
+        el.classList.add('bg-slate-100', 'text-slate-700', 'border', 'border-slate-200');
+      }
+
+      setTimeout(() => {
+        if (type === 'success' || type === 'info') hideStatus();
+      }, 5000);
+    }
+
+    function hideStatus() {
+      document.getElementById('statusNotification').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
